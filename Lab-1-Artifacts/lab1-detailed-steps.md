@@ -32,21 +32,27 @@
 
 10.	In **Number of instances** enter **3**.
 
+10. EBS Storage (GiB), leave at default (**22**)
+
 11.	In **Key pair** select an existing EC2 Key pair for which you have the private key.
 
-12.	In **VPC** select **ECSVPC**.
+12.	In **VPC** select **ECSVPC** or **Create new VPC**. 
 
-13.	In **Subnets** select all subnets containing the word **Private**.
+12. In **CIDR block**, insert something like **10.1.0.0/16** 
 
-14.	In **Security group**, select the Security Group containing the term **InstanceSecurityGroup**.
+13.	In **Subnets** ensure they are part of your CIDR Block: **10.1.0.0/24** and **10.1.1.0/24**
 
-15.	In **Container Instance IAM role** select the IAM role containing the term **catsndogssetup-EC2Role**.
+14.	In **Security group**, you want to **Create new security group**
 
-16.	In **IAM role for a Spot Fleet request** select the role with a name containing **catsndogssetup-SpotFleetTaggingRole**.
+14. In **Security Group inbound rules**, leave it as default
+
+15.	In **Container Instance IAM role** select a **Create new role** or select the IAM role containing the term **catsndogssetup-EC2Role**.
+
+16.	In **IAM role for a Spot Fleet request**  select a **Create new role** or select the role with a name containing **catsndogssetup-SpotFleetTaggingRole**.
 
 17.	Click **Create**.
 
-18.	You will see the cluster creation steps appear. The final step is the creation of a CloudFormation stack. Note the name of this stack.
+18.	You will see the cluster creation steps appear. The final step is the creation of a CloudFormation stack. Note the name of this stack.  This step should take a few minutes.
 
 19.	Open the AWS console in a new browser tab and under **Management Tools**, click **CloudFormation**.
 
@@ -72,55 +78,71 @@ In this task we will set up Auto Scaling for the Spot fleet, to provide cost-eff
 
 4.	Select the **MemoryReservation** metric for the cluster you created earlier, then click **Next**. It might take a minute or two for this new metric to appear in the CloudWatch console. If the metric is not yet listed, refresh the page and try again.
 
-5.	Give the alarm a name, for example **ScaleUpSpotFleet**.
+5.	Give the alarm a **Metric name**, for example **ScaleUpSpotFleet**.
 
-6.	Fill in the following under **Whenever: MemoryReservation**:
-
-    1. Is: **>= 20**
-    
-    2. For: **2** out of 2 datapoints
+6.	For the **statistic** select **Standard, Maximum**.
 
 7.	For the **Period** select **1 minute**.
 
-8.	For the **statistic** select **Standard, Maximum**.
+8.	Fill in the following under **Conditions**:
 
-9.	In **Actions**, delete the pre-created Notification action.
+    1. Thresholde type: **static**
+    
+    2. Whenever Memory Reservation Is: **greater**
 
-10.	Click **Create Alarm**.
+    3. than... **20**
 
-11.	Click **Create Alarm** to create the alarm for scaling in.
+    4. Additional Configuration Datapoints to Alarm : **2** out of 2 datapoints
+
+9.  Click **next** a
+
+9.	In **Configure Actions**, remove the pre-created Notification action.
+
+10.	Click **Next** and enter an **alarm name**.
+
+10. Review the details and then **Create Alarm**
+
+We will now create a second alrm for scaling down
+
+11.	Click **Create Alarm** to create the alarm for scaling down.
 
 12.	Click **ClusterName** under ECS Metrics.
 
 13.	Select the **MemoryReservation** metric for the cluster you created earlier, then click **Next**.
 
-14.	Give the alarm a name, for example **ScaleDownSpotFleet**.
+14.	For the **statistic** select **Standard, Maximum**.
 
-15.	Fill in the following under **Whenever: MemoryReservation**:
+15.	For the **Period** select **1 minute**.
 
-    1. Is: **<= 20**
+16.	Fill in the following under **Conditions**:
+
+    1. Thresholde type: **static**
     
-    2. For: **2** out of 2 datapoints
-    
-16.	For the **Period** select **1 minute**.
+    2. Whenever Memory Reservation Is: **greater**
 
-17.	For the **statistic** select **Standard, Maximum**.
+    3. than... **20**
 
-18.	In **Actions**, delete the pre-created Notification action.
+    4. Additional Configuration Datapoints to Alarm : **2** out of 2 datapoints
 
-19.	Click **Create Alarm**.
+17.  Click **next** a
 
-20.	Return to the AWS console home. In **Compute**, click **EC2**.
+18.	In **Configure Actions**, remove the pre-created Notification action.
+
+19.	Click **Next** and enter an **alarm name**.
+
+20. Review the details and then **Create Alarm**
+
+When we created the cluster, it automagically created a Spot Request.  We will now update that Spot Request to use our newly created alarms.  Start by opening the **EC2 Console**.
 
 21.	Click **Spot Requests**.
 
 22.	Select the checkbox by the Spot request.
 
-23.	Click the Auto Scaling tab in the lower pane, then click **Configure**.
+23.	Click the **Auto Scaling** tab in the lower pane, then click **Configure**.
 
 24.	In **Scale capacity** between, set **3 and 10** instances.
 
-25.	Under **Scaling policies**, click the **Scale Spot Fleet using step or simple scaling policies** option
+25.	Under **Scaling policies**, click the **Scale Spot Fleet using step or simple scaling policies** option.  This will be under the default scaling policy.
 
 26.	In Scaling policies first update the ScaleUp policy:
 
@@ -136,6 +158,8 @@ In this task we will set up Auto Scaling for the Spot fleet, to provide cost-eff
         
         2. Add 3 instances when 50 <= MemoryReservation <= infinity
 
+        3. Change cooldown Period to **30** seconds
+
 27.	Then update the ScaleDown policy:
     
     1. In **Policy Trigger** select the **ScaleDownSpotFleet** alarm you created earlier.
@@ -149,6 +173,8 @@ In this task we will set up Auto Scaling for the Spot fleet, to provide cost-eff
         1. Remove 1 instances when 20 >= MemoryReservation > 10
         
         2. Remove 2 instances when 10 >= MemoryReservation > -infinity
+
+        3. Change cooldown Period to **30** seconds
 
 28.	Click **Save**
 
@@ -166,11 +192,11 @@ If you have used Auto Scaling groups with ECS before, you can launch a CloudForm
 
 2.	Right click on an instance and click **Launch more like this**.
 
-3.	At the top of the console click **Choose Instance Type**.
+3.	You will see the review page, find the **Instance Type** section and click **Edit**
 
-4.	Select the **m4.large** instance type.
+4.	Select the **m5.large** instance type.
 
-5.	Click **Configure Instance**. If you receive a pop-up dialog, select “Yes, I want to continue with this instance type (m4.large)” and click **Next**.
+5.	Click **Configure Instance**. If you receive a pop-up dialog, select “Yes, I want to continue with this instance type (m5.large)” and click **Next**.
 
 6.	Beside **Number of instances** click **Launch into Auto Scaling Group**.
 
@@ -180,6 +206,8 @@ If you have used Auto Scaling groups with ECS before, you can launch a CloudForm
 
 9.	In IAM role select the IAM role containing the term **EC2InstanceProfile**.
 
+9.  Leave the other options as default values.
+
 10.	Expand Advanced Details. Copy the following text and paste it into the User data dialog box. This controls which ECS cluster the instance will join:
 
 ```
@@ -187,7 +215,7 @@ If you have used Auto Scaling groups with ECS before, you can launch a CloudForm
 echo ECS_CLUSTER=catsndogsECScluster >> /etc/ecs/ecs.config
 ```
 
-11.	Click **Next: Add storage**.
+11.	Click **Next: Add storage** and accept the default values.
 
 12.	Click **Next: Configure Security Group**.
 
@@ -203,6 +231,14 @@ echo ECS_CLUSTER=catsndogsECScluster >> /etc/ecs/ecs.config
 
 18.	In **Subnet** select all subnets containing the word **Private**. Click **Next: Configure scaling policies**.
 
+19. Click **Next:Configure Scaling policies**
+
+19. Select **Keep this group at its initial size**
+
+19. Click **Next: configure notifications**
+
+19. Click **Next: configure tags**
+
 19.	Click **Review**.
 
 20.	Click **Create Auto Scaling group**, then click **Close**.
@@ -211,7 +247,7 @@ echo ECS_CLUSTER=catsndogsECScluster >> /etc/ecs/ecs.config
 
 22.	Click the ECS cluster **catsndogsECScluster**.
 
-23.	Click the **ECS Instances** tab and wait until the On-Demand instance appears in the list. You can continue the next task once the instance appears. If the instance does not appear within a few minutes, check the configuration of the Launch Configuration, specifically the **User data** script and the **VPC and subnet** selections.
+23.	Click the **ECS Instances** tab and wait until the On-Demand instance appears in the list. You can continue the next task once the instance appears. If the instance does not appear within a few minutes, check the configuration of the Launch Configuration, specifically the **User data** script, the **IAM role**, and the **VPC and subnet** selections.
 
 You should now have an ECS cluster composed of three instances from the Spot fleet request, and one instance from the on-demand Auto Scaling group.
 
