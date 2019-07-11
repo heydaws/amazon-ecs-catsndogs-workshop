@@ -16,11 +16,11 @@
 
 7.	In **EC2 instance types** add several different instance types and sizes. We recommend you pick smaller instances sizes, such as:
 
-    1. m4.large
+    1. m5.large
     
-    2. c4.large
+    2. c5.large
     
-    3. r4.large
+    3. r5.large
     
     4. i3.large
     
