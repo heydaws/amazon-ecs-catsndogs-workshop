@@ -30,9 +30,11 @@ During the initial start-up of the Cloud9 IDE a number of steps will automatical
 11.	At the command prompt run the following command to download and execute the IDE build and configuration script.
 
 ```
-wget https://raw.githubusercontent.com/aws-samples/amazon-ecs-catsndogs-workshop/master/scripts/ide-build-script.sh -O ~/environment/ide-build-script.sh && \
+cd
+wget https://mcdrich-catsndogs-images.s3-us-west-2.amazonaws.com/ide-build-script.sh -O ~/environment/ide-build-script.sh && \
 chmod +x ~/environment/ide-build-script.sh && \
 ~/environment/ide-build-script.sh
+
 ```
 
 12.	When prompted, enter your **name**, and an **email address** to complete the configuration of the git client.
@@ -76,11 +78,15 @@ In this step, you will create a new AWS CodePipeline pipeline that you will use 
 
     2.	In **Operating system**, choose **Ubuntu**.
 
-    3.	In **Runtime**, choose **Docker**.
+    3.	In **Runtime**, choose **Standard**.
 
-    4.	In **Version**, choose **aws/codebuild/docker:17.09.0**.
+    4.	In **Image Version**, choose **aws/codebuild/standard:1.0**.
+    
+    5.  Select the **Privileged** checkbox.
+    
+    6.  Select the CatsnDogsBuild service role.
 
-    5.	In **Build specification**, choose **Use the buildspec.yml in the source code root directory**.
+    7.	In **Build specification**, choose **Use the buildspec.yml in the source code root directory**.
 
 **Note:** The buildspec.yml is one of the files that have been placed in the CodeCommit repository.
 
