@@ -1,10 +1,32 @@
 # Lab 1 - Cost management and EC2 scaling - Detailed Steps
 
+## 1.0  Ensure you have run the pre-requisites
+
+1.  Make sure you have an EC2 keypair created.
+
+    1.  Sign-in to the AWS EC2 console at https://console.aws.amazon.com/ec2/ 
+    2.	Click Key Pairs and then click Create Key Pair. 
+    3.	Give the key pair a name and click Create. The console will generate a new key pair and download the private key.
+    4.  Keep the key pair somewhere safe
+
+2. Deploy the initial CloudFormation template.  This creates IAM roles, an S3 bucket, and other resources that you will use in later labs. The template is called cfn-templates/Lab0-baseline-setup.yml If you are sharing an AWS account with someone else doing the workshop, only one of you needs to create this stack. In Stack name, enter catsndogssetup. Later labs will reference this stack by name, so if you choose a different stack name you will need to change the LabSetupStackName parameter in later labs.
+
+    1. In the **Management Tools** section click **CloudFormation**.
+
+    2. Click **Create Stack**.
+
+    3. Select **Upload a template to Amazon S3**, then click **Choose** File and choose the file named **Lab0-baseline-setup.yml**
+
+    4. In Stack name, enter **catsndogssetup**
+
+    5. Accept the defaults and ensure that you tick **I acknowledge that AWS CloudFormation might create IAM resources with custom names**.
+
+
 ## 1.1	Create a new ECS cluster using Spot Fleet
 
 1.	Sign-in to the AWS management console and open the Amazon ECS console at https://console.aws.amazon.com/ecs/.
 
-2.	In the AWS Console, ensure you have the correct region selected. The instructor will tell you which region to use.
+2.	In the AWS Console, ensure you have the correct region selected.
 
 3.	In the ECS console click **Clusters**, then click **Create Cluster**. Select **EC2 Linux + Networking** then hit **Next Step**
 
@@ -16,7 +38,7 @@
 
 7.	In **EC2 instance types** add several different instance types and sizes. We recommend you pick smaller instances sizes, such as:
 
-    1. m5.large
+    1. m5.xlarge
     
     2. c5.large
     
@@ -28,27 +50,27 @@
 
 8.	In **Maximum big price (per instance/hour)** you can click the **Spot prices** link to view the current spot prices for the instance types and sizes you have selected. More information on how EC2 Spot instance pricing works is available on the Amazon EC2 Spot Instances Pricing page: https://aws.amazon.com/ec2/spot/pricing/
 
-9.	Enter a maximum bid price. For the purposes of the workshop, $0.25 should offer an excellent chance of your Spot bid being fulfilled. It does not matter if your spot bid is not fulfilled. In a later step you will add an on-demand instance to the cluster.
+9.	Enter a maximum bid price. For the purposes of the workshop, 0.25 should offer an excellent chance of your Spot bid being fulfilled. It does not matter if your spot bid is not fulfilled. In a later step you will add an on-demand instance to the cluster.
 
 10.	In **Number of instances** enter **3**.
+
+10. use the default EC2 AMI.
 
 10. EBS Storage (GiB), leave at default (**22**)
 
 11.	In **Key pair** select an existing EC2 Key pair for which you have the private key.
 
-12.	In **VPC** select **ECSVPC** or **Create new VPC**. 
+12.	In **VPC** select **ECSVPC**
 
-12. In **CIDR block**, insert something like **10.1.0.0/16** 
+13.	In **Subnets** select all subnets containing the word **Private**.
 
-13.	In **Subnets** ensure they are part of your CIDR Block: **10.1.0.0/24** and **10.1.1.0/24**
-
-14.	In **Security group**, you want to **Create new security group**
+14.	In **Security group**, select the Security Group containing the term **InstanceSecurityGroup**.
 
 14. In **Security Group inbound rules**, leave it as default
 
-15.	In **Container Instance IAM role** select a **Create new role** or select the IAM role containing the term **catsndogssetup-EC2Role**.
+15.	In **Container Instance IAM role** select the IAM role containing the term **catsndogssetup-EC2Role**.
 
-16.	In **IAM role for a Spot Fleet request**  select a **Create new role** or select the role with a name containing **catsndogssetup-SpotFleetTaggingRole**.
+16.	In **IAM role for a Spot Fleet request** select the role with a name containing **catsndogssetup-SpotFleetTaggingRole**.
 
 17.	Click **Create**.
 
@@ -78,9 +100,9 @@ In this task we will set up Auto Scaling for the Spot fleet, to provide cost-eff
 
 4.	Select the **MemoryReservation** metric for the cluster you created earlier, then click **Next**. It might take a minute or two for this new metric to appear in the CloudWatch console. If the metric is not yet listed, refresh the page and try again.
 
-5.	Give the alarm a **Metric name**, for example **ScaleUpSpotFleet**.
+5.	Leave the **Metric name**, as **Memory Reservation**
 
-6.	For the **statistic** select **Standard, Maximum**.
+6.	For the **statistic** select **Maximum**.
 
 7.	For the **Period** select **1 minute**.
 
@@ -94,15 +116,15 @@ In this task we will set up Auto Scaling for the Spot fleet, to provide cost-eff
 
     4. Additional Configuration Datapoints to Alarm : **2** out of 2 datapoints
 
-9.  Click **next** a
+9.  Click **next** 
 
 9.	In **Configure Actions**, remove the pre-created Notification action.
 
-10.	Click **Next** and enter an **alarm name**.
+10.	Click **Next** and enter an **alarm name**, for example **ScaleUpSpotFleet**.
 
 10. Review the details and then **Create Alarm**
 
-We will now create a second alrm for scaling down
+We will now create a second alarm for scaling down
 
 11.	Click **Create Alarm** to create the alarm for scaling down.
 
@@ -110,7 +132,7 @@ We will now create a second alrm for scaling down
 
 13.	Select the **MemoryReservation** metric for the cluster you created earlier, then click **Next**.
 
-14.	For the **statistic** select **Standard, Maximum**.
+14.	For the **statistic** select **Maximum**.
 
 15.	For the **Period** select **1 minute**.
 
@@ -118,17 +140,17 @@ We will now create a second alrm for scaling down
 
     1. Thresholde type: **static**
     
-    2. Whenever Memory Reservation Is: **greater**
+    2. Whenever Memory Reservation Is: **Lower**
 
     3. than... **20**
 
     4. Additional Configuration Datapoints to Alarm : **2** out of 2 datapoints
 
-17.  Click **next** a
+17.  Click **next**
 
 18.	In **Configure Actions**, remove the pre-created Notification action.
 
-19.	Click **Next** and enter an **alarm name**.
+19.	Click **Next** and enter an **alarm name**, such as **ScaleDownSpotFleet**
 
 20. Review the details and then **Create Alarm**
 

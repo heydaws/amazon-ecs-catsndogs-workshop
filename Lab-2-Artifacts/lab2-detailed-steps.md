@@ -4,7 +4,7 @@
 
 This step will use CloudFormation to create the cats, dogs, and simplehomepage tasks and services within ECS, and associate the services with an Elastic Load Balancing Application Load Balancer. It will also create CloudWatch alarms for the cats and dogs services, which you will use to set up Task Auto Scaling.
 
-1.	In the AWS Console, ensure you have the correct region selected. The instructor will tell you which region to use.
+1.	In the AWS Console, ensure you have the correct region selected.
 
 2.	In the **Management Tools** section click **CloudFormation**.
 
@@ -14,8 +14,7 @@ This step will use CloudFormation to create the cats, dogs, and simplehomepage t
 
 5.	In Stack name, enter **catsndogsECStasksandservices**
 
-6.	Leave the ECSCluster and LabSetupStackName parameters at their default, unless you changed the name of the CloudFormation stack from the Lab 
-setup, or named the ECS cluster something other than catsndogsECScluster.
+6.	Leave the ECSCluster and LabSetupStackName parameters at their default, unless you changed the name of the CloudFormation stack from the Lab setup, or named the ECS cluster something other than catsndogsECScluster.
 
 7.	Click **Next**, then click **Next** again, then click **Create**.
 
@@ -43,7 +42,7 @@ In this task you will set up Task Auto Scaling for the cats and dogs services
 
 4. On the **Configure Service** page click **Next Step**.
 
-5. On the **Network configuration** page click **Next Step**.
+5. On the **Configure Network** page click **Next Step**.
 
 6. On the Auto Scaling page select **Configure Service Auto Scaling to adjust your service’s desired count**.
 

@@ -2,7 +2,7 @@
 
 ## 6.1	Deploy the lab prerequisites
 
-This step will use CloudFormation to prerequisite resources for this lab, which include:
+This step will use CloudFormation to provision resources for this lab, which include:
 •	An instance of the Amazon Cloud9 IDE.
 
 1.	In the AWS console ensure you have the correct region selected.

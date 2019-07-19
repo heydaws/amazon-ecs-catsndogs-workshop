@@ -12,13 +12,13 @@ In this task you will create a new Task definition that will run the image asses
 
 4. In **Task Definition Name** enter **ImageAssessor**.
 
-5. Under **Container Defintions** click **Add Container**.
+5. Use the default values until you reach the **Container Definitions** click **Add Container**.
 
 6. In **Container Name** enter **ImageAssessmentContainer**.
 
 7. In **Image** enter **205094881157.dkr.ecr.us-west-2.amazonaws.com/image-assessor:latest**.
 
-8. In **Memory Limits (MiB)** enter **128**.
+8. In **Memory Limits (MiB)** enter a **Hard limit** of **128**.
 
 9. In **Env Variables** you need to enter the URL of the catsndogs load balancer. The ImageAssessor container uses this to send API commands to the cats containers:
 
@@ -52,9 +52,9 @@ In this task you will create a scheduled ECS task which executes every two minut
     
     1. In **Target id**, enter **catsndogsLab** and set **Launch Type** to **EC2**.
     
-    2. For **Task Definition**, from the drop list, choose the **ImageAssessor:1** image.
+    2. For **Task Definition**, from the drop list, choose the **ImageAssessor** family and **1(latest)** Revision.
     
-    3. Set the **Number of tasks** to **1**.
+    3. Set the **Number of tasks** to **1**, and **Task role override** as **empty**
     
     4. For **CloudWatch Events IAM role for this target**, choose the role with **catsndogssetup** in the name. 
 

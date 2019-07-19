@@ -4,9 +4,9 @@
 
 In this step, you will use EC2 Systems Manager Parameter Store to create a secure string for use with the new version of the cats container.
 
-1.	In the AWS Console, ensure you have the correct region selected. The instructor will tell you which region to use.
+1.	In the AWS Console, ensure you have the correct region selected.
 
-2.	In the **Compute** section click **EC2**.
+2.	In the **Management & Governance** section click **Systems Manager**.
 
 3.	At the bottom left of the page, click **Parameter Store**.
 
@@ -16,19 +16,24 @@ In this step, you will use EC2 Systems Manager Parameter Store to create a secur
 
 6.	In **Description** enter **Location of Unicorns for catsndogs ECS lab**.
 
+6.  For **Tier**, leave as **Standard**
+
 7.	In **Type** select **Secure String**.
+
+7.  For **KMS key source**, select **My current account** (as the initial cloud formation template created the key)
 
 8.	In **KMS Key ID**, select **alias/keyForUnicorns (custom)**.
 
 9.	In **Value**, enter **catsndogs-assets.s3.amazonaws.com**
 
-10.	Click **Create parameter**.
-
-11.	Click **Tags** tab and then click **Add Tags**.
+11.	In the **Tags - Optional** section click **Add Tag**.
 
 12.	For **Tag Key** enter **Classification**.
 
 13.	For **Tag Value** enter **Mythical**. 
+
+10.	Click **Create parameter**.
+
 
 The tag information will be used to restrict access to the UnicornLocation parameter, more information can be found here: 
 
@@ -38,7 +43,7 @@ http://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-ac
 
 In this step you will deploy the new version of the cats container, and pass in parameters so it can read the Parameter Store secure string you created.
 
-1. In the AWS Console, ensure you have the correct region selected. The instructor will tell you which region to use.
+1. In the AWS Console, ensure you have the correct region selected.
 
 2. In the **Compute** section click **ECS**.
 
@@ -46,17 +51,27 @@ In this step you will deploy the new version of the cats container, and pass in 
 
 4. Select the cats task and click **Create new revision**.
 
-5. In Task Role, select the task role starting with **catsndogssetup-catsContainerTaskRole**.
+4. Leave the **Task Definition Name** as **cats**
+
+5. In **Task Role**, select the task role starting with **catsndogssetup-catsContainerTaskRole**.
+
+5. Leave **Network Mode** as **default**
+
+5. For **Requires compatibilities** select **EC2**
+
+5. For **Task Execution role** leave as **None**
+
+5. For **Task Memory** and **Task CPU**, leave them as **blank**
 
 6. Under **Container Definitions**, click the cats container name. This opens the container configuration window.
 
-7. In **Image**, edit the container registry tag. Remove “:v1” and replace it with “:v2”.
+7. In **Image**, edit the container registry tag. At the end of the string, remove “:v1” and replace it with “:v2”.
 
 8. Under ENVIRONMENT add two new Env Variables. The updated code in the new cats container will read these variables when starting.
 
     1. Key: **PARAMETER_STORE_NAME** Value: **UnicornLocation**
     
-    2. Key: **REGION** Value: your region identifier, for example eu-west-1
+    2. Key: **REGION** Value: your region identifier, for example us-west-2
     
     3. Key: **Tag** Value: **v2**
 
