@@ -25,7 +25,7 @@ This step will use CloudFormation to provision resources for this lab, which inc
 
 10.	Expand **Outputs**, locate the **Cloud9IDE** output. Click on the associated link to launch the Cloud9 IDE.
 
-During the initial start-up of the Cloud9 IDE a number of steps will automatically run to prepare the environment for first use. The steps include cloning an AWS CodeCommit repository in to the Cloud9 IDE workspace.
+During the initial start-up of the Cloud9 IDE a number of steps will automatically run to prepare the environment for first use. 
 
 11.	At the command prompt run the following command to download and execute the IDE build and configuration script.
 
@@ -44,9 +44,12 @@ chmod +x ~/environment/ide-build-script.sh && \
 14. At the command prompt, create the initial commit and push the master branch:
 
 ```
+aws codecommit create-repository --repository-name lab6
 cd ~/environment/dogs
+git init
 git add .
 git commit -m "Initial commit"
+git remote add origin https://git-codecommit.us-east-1.amazonaws.com/v1/repos/lab6
 git push -u origin master
 ```
 
