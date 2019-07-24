@@ -44,12 +44,12 @@ chmod +x ~/environment/ide-build-script.sh && \
 14. At the command prompt, create the initial commit and push the master branch:
 
 ```
-aws codecommit create-repository --repository-name lab6
+aws codecommit create-repository --repository-name lab6-dogs
 cd ~/environment/dogs
 git init
 git add .
 git commit -m "Initial commit"
-git remote add origin https://git-codecommit.us-east-1.amazonaws.com/v1/repos/lab6
+git remote add origin https://git-codecommit.us-east-1.amazonaws.com/v1/repos/lab6-dogs
 git push -u origin master
 ```
 
@@ -101,7 +101,7 @@ In this step, you will create a new AWS CodePipeline pipeline that you will use 
 
     1.	In **Environment variables** add the following:
 
-        1.	**AWS_DEFAULT_REGION:** for example: eu-west-1
+        1.	**AWS_DEFAULT_REGION:** for example: us-east-1
 
         2.	**AWS_ACCOUNT_ID:** for example: 12345567891011
 
@@ -147,7 +147,7 @@ The development team at catsndogs.lol would like you to deploy a new revision of
 
 6.	Run the command `nano index.html` to edit the index.html file.
 
-7.	Locate the `background` property, within the ``<style>`` tags, and change the value to another color. For example, ``“background: blue;”``
+7.	Locate the `background` property, within the ``<style>`` tags, and change the value to another color. For example, ``“background: white;”``
 
 8.	Within the nano editor press `ctrl + x` to exit the editor. When prompted type `Y` to confirm that the changes should be saved.
 
@@ -156,7 +156,7 @@ The development team at catsndogs.lol would like you to deploy a new revision of
 ```
 git add index.html
 
-git commit -m ‘changing background color
+git commit -m 'changing background color' index.html
 
 git push
 ```
