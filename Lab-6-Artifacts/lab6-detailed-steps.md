@@ -131,6 +131,8 @@ In this step, you will create a new AWS CodePipeline pipeline that you will use 
 
 17.	Review the settings and click **Create pipeline**.
 
+18. Watch the pipeline build the new container image, being sure to tail the logs in CodeBuild while then are in progress.
+
 ## 6.3	Deploy a new version of the Dogs application
 
 The development team at catsndogs.lol would like you to deploy a new revision of the Dogs application, to test the pipeline. You will do this by making a small change to the index.html file of the Dogs application.
